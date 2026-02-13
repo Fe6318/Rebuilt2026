@@ -110,7 +110,7 @@ public class RobotContainer
   public RobotContainer()
   {
      // Set the default command to force the arm to go to 0.
-    intakePivot.setDefaultCommand(intakePivot.setAngle(Degrees.of(0)));
+   // intakePivot.setDefaultCommand(intakePivot.setAngle(Degrees.of(0)));
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -132,7 +132,7 @@ public class RobotContainer
 
     
     // Set the default command to force the shooter rest.
-    intakeMain.setDefaultCommand(intakeMain.set(0));
+    //intakeMain.setDefaultCommand(intakeMain.set(0));
 
   }
 

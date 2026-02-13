@@ -42,8 +42,8 @@ public class IntakePivot extends SubsystemBase {
   .withSimClosedLoopController(10, 0, 0, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
   // Feedforward Constants
   // https://www.reca.lc/arm?armMass=%7B%22s%22%3A0.5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A6%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=100&endAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A12%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A-90%2C%22u%22%3A%22deg%22%7D
-  .withFeedforward(new ArmFeedforward(0, .08, .23))
-  .withSimFeedforward(new ArmFeedforward(0, .08, .23))
+  .withFeedforward(new ArmFeedforward(0, 0, .0))
+  .withSimFeedforward(new ArmFeedforward(0, 0, 0))
   // Telemetry name and verbosity level
   .withTelemetry("PivotMotor", TelemetryVerbosity.HIGH)
   // Gearing from the motor rotor to final shaft.
@@ -64,7 +64,7 @@ public class IntakePivot extends SubsystemBase {
 
   private ArmConfig armCfg = new ArmConfig(sparkSmartMotorController)
   // Soft limit is applied to the SmartMotorControllers PID
-  .withSoftLimits(Degrees.of(-90), Degrees.of(90))
+  .withSoftLimits(Degrees.of(-75), Degrees.of(75))
   // Hard limit is applied to the simulation.
   .withHardLimit(Degrees.of(-90), Degrees.of(90))
   // Starting position is where your arm starts
