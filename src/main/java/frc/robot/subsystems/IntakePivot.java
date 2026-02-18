@@ -57,7 +57,7 @@ public class IntakePivot extends SubsystemBase {
   .withClosedLoopRampRate(Seconds.of(0.25))
   .withOpenLoopRampRate(Seconds.of(0.25));
    // Vendor motor controller object
-  private SparkMax spark = new SparkMax(25, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(18, MotorType.kBrushless);
   public IntakePivot() {}
   // Create our SmartMotorController from our Spark and config with the NEO.
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);

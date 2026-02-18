@@ -56,7 +56,7 @@ public class IntakeMain extends SubsystemBase {
   .withStatorCurrentLimit(Amps.of(40));
 
   // Vendor motor controller object
-  private SparkMax spark = new SparkMax(4, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(14, MotorType.kBrushless);
 
     // Create our SmartMotorController from our Spark and config with the NEO.
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
