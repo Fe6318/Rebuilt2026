@@ -21,11 +21,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.BallElevator;
 import frc.robot.subsystems.IntakeMain;
 import frc.robot.subsystems.IntakePivot;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -42,12 +45,15 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final         CommandXboxController operatorXbox = new CommandXboxController(1);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve"));
 
   private final IntakeMain intakeMain = new IntakeMain();
   private final IntakePivot intakePivot = new IntakePivot();
+  private final Shooter shooter = new Shooter();
+  private final BallElevator ballElevator = new BallElevator();
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
 
@@ -208,16 +214,11 @@ public class RobotContainer
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
     }
+// intake 
+operatorXbox.leftBumper().whileTrue(intakeMain.set(0.6));
 
-      // Schedule `setVelocity` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    driverXbox.a().whileTrue(intakeMain.setVelocity(RPM.of(60)));
-    driverXbox.b().whileTrue(intakeMain.setVelocity(RPM.of(300)));
-
-     // Schedule `setAngle` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    driverXbox.x().whileTrue(intakePivot.setAngle(Degrees.of(-5)));
-    driverXbox.y().whileTrue(intakePivot.setAngle(Degrees.of(15)));
+// shoot 
+operatorXbox.a().whileTrue(new ParallelCommandGroup(shooter.setVelocity(RPM.of(100)),ballElevator.set(0.5)));
 
   }
 
