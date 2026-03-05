@@ -53,7 +53,7 @@ public class IntakePivot extends SubsystemBase {
   // Motor properties to prevent over currenting.
   .withMotorInverted(false)
   .withIdleMode(MotorMode.BRAKE)
-  .withStatorCurrentLimit(Amps.of(40))
+  .withStatorCurrentLimit(Amps.of(35))
   .withClosedLoopRampRate(Seconds.of(0.25))
   .withOpenLoopRampRate(Seconds.of(0.25));
    // Vendor motor controller object
@@ -63,10 +63,8 @@ public class IntakePivot extends SubsystemBase {
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
 
   private ArmConfig armCfg = new ArmConfig(sparkSmartMotorController)
-  // Soft limit is applied to the SmartMotorControllers PID
-  .withSoftLimits(Degrees.of(-75), Degrees.of(75))
-  // Hard limit is applied to the simulation.
-  .withHardLimit(Degrees.of(-90), Degrees.of(90))
+
+ 
   // Starting position is where your arm starts
   .withStartingPosition(Degrees.of(0))
   // Length and mass of your arm for sim.

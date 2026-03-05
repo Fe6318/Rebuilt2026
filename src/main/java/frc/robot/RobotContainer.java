@@ -61,9 +61,9 @@ public class RobotContainer
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * -1,
-                                                                () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(driverXbox::getRightX)
+                                                                () -> driverXbox.getLeftY(),
+                                                                () -> driverXbox.getLeftX())
+                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -137,8 +137,17 @@ public class RobotContainer
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     
-    // Set the default command to force the shooter rest.
-    //intakeMain.setDefaultCommand(intakeMain.set(0));
+    // Set the default command to force the intake main rest.
+    intakeMain.setDefaultCommand(intakeMain.set(0));
+
+    // set the default comman to foroce the shooter rest. 3500
+    shooter.setDefaultCommand(shooter.setVelocity(RPM.of(3200)));
+
+    // set the default command to force the ballElevator rest.
+    ballElevator.setDefaultCommand(ballElevator.set(0));
+
+    //set the default comman to force the intakePivot down
+   // intakePivot.setDefaultCommand(intakePivot.set(0.25));
 
   }
 
@@ -215,10 +224,17 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     }
 // intake 
-operatorXbox.leftBumper().whileTrue(intakeMain.set(0.6));
+operatorXbox.leftBumper().whileTrue(intakeMain.set(0.95));
+operatorXbox.rightBumper().whileTrue(intakeMain.set(-0.95));
 
 // shoot 
-operatorXbox.a().whileTrue(new ParallelCommandGroup(shooter.setVelocity(RPM.of(100)),ballElevator.set(0.5)));
+operatorXbox.a().whileTrue(ballElevator.set(1));
+
+// intakePivot requested to comment out because of chain untill it is fixed.
+operatorXbox.leftStick().whileTrue(intakePivot.set(-0.15).alongWith(intakeMain.set(0.95)));
+
+//intake piviot move down
+operatorXbox.y().whileTrue(intakePivot.set(0.25));
 
   }
 

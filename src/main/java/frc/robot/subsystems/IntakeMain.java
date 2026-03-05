@@ -51,7 +51,7 @@ public class IntakeMain extends SubsystemBase {
   // You could also use .withGearing(12) which does the same thing.
   .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
   // Motor properties to prevent over currenting.
-  .withMotorInverted(false)
+  .withMotorInverted(true)
   .withIdleMode(MotorMode.COAST)
   .withStatorCurrentLimit(Amps.of(40));
 
@@ -96,6 +96,7 @@ public class IntakeMain extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command set(double dutyCycle) {return shooter.set(dutyCycle);}
+  
 
   public IntakeMain() {}
 
