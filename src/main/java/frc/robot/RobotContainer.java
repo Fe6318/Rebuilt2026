@@ -22,12 +22,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.BallElevator;
 import frc.robot.subsystems.IntakeMain;
 import frc.robot.subsystems.IntakePivot;
+import frc.robot.subsystems.MotorOnBottom;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -41,7 +43,8 @@ import swervelib.SwerveInputStream;
 public class RobotContainer
 {
 
- 
+ public static final double PIVOT_DOWN_SPEED = 0.35;
+ public static final double PIVOT_UP_SPEED = -0.35;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
@@ -53,6 +56,7 @@ public class RobotContainer
   private final IntakeMain intakeMain = new IntakeMain();
   private final IntakePivot intakePivot = new IntakePivot();
   private final Shooter shooter = new Shooter();
+  private final MotorOnBottom motor = new MotorOnBottom();
   private final BallElevator ballElevator = new BallElevator();
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -132,6 +136,22 @@ public class RobotContainer
 
     //Add a simple auto option to have the robot drive forward for 1 second then stop
     autoChooser.addOption("Drive Forward", drivebase.driveForward().withTimeout(1));
+
+    //auto option to have the robot move back and shoot0\11
+    autoChooser.addOption("Standard Auto", drivebase.driveForward().withTimeout(1.6)
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                 .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(drivebase.drivebackward().withTimeout(1.6)));
     
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -148,6 +168,8 @@ public class RobotContainer
 
     //set the default comman to force the intakePivot down
    // intakePivot.setDefaultCommand(intakePivot.set(0.25));
+
+    motor.setDefaultCommand(motor.set(0));
 
   }
 
@@ -216,7 +238,7 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyroWithAlliance)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
@@ -227,14 +249,16 @@ public class RobotContainer
 operatorXbox.leftBumper().whileTrue(intakeMain.set(0.95));
 operatorXbox.rightBumper().whileTrue(intakeMain.set(-0.95));
 
+
 // shoot 
-operatorXbox.a().whileTrue(ballElevator.set(1));
+operatorXbox.a().whileTrue(ballElevator.set(1).alongWith(motor.set(0.6)));
 
 // intakePivot requested to comment out because of chain untill it is fixed.
-operatorXbox.leftStick().whileTrue(intakePivot.set(-0.15).alongWith(intakeMain.set(0.95)));
+operatorXbox.povUp().whileTrue(intakePivot.set(PIVOT_UP_SPEED).alongWith(intakeMain.set(0.95)));
+operatorXbox.povDown().whileTrue(intakePivot.set(PIVOT_DOWN_SPEED));
 
 //intake piviot move down
-operatorXbox.y().whileTrue(intakePivot.set(0.25));
+//operatorXbox.y().whileTrue(intakePivot.set(0.25));
 
   }
 
@@ -252,5 +276,10 @@ operatorXbox.y().whileTrue(intakePivot.set(0.25));
   public void setMotorBrake(boolean brake)
   {
     drivebase.setMotorBrake(brake);
+  }
+
+  public void resetHeading()
+  {
+    drivebase.zeroGyroWithAlliance();
   }
 }
