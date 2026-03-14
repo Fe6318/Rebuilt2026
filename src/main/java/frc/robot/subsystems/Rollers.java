@@ -37,7 +37,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
-  public class MotorOnBottom extends SubsystemBase {
+  public class Rollers extends SubsystemBase {
 
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
@@ -45,10 +45,10 @@ import yams.motorcontrollers.local.SparkWrapper;
   .withClosedLoopController(0, 0, 0)
   .withSimClosedLoopController(0, 0, 0)
   // Feedforward Constants
-  .withFeedforward(new SimpleMotorFeedforward(0, 0., 0))
-  .withSimFeedforward(new SimpleMotorFeedforward(0, 0., 0))
+  .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
+  .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
   // Telemetry name and verbosity level
-  .withTelemetry("MotorOnBottom", TelemetryVerbosity.HIGH)
+  .withTelemetry("RollerMotor", TelemetryVerbosity.HIGH)
   // Gearing from the motor rotor to final shaft.
   // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
   // You could also use .withGearing(12) which does the same thing.
@@ -56,14 +56,14 @@ import yams.motorcontrollers.local.SparkWrapper;
   // Motor properties to prevent over currenting.
   .withMotorInverted(false)
   .withIdleMode(MotorMode.COAST)
-  .withStatorCurrentLimit(Amps.of(20));
+  .withStatorCurrentLimit(Amps.of(40));
 
    // Vendor motor controller object
-  private SparkMax spark = new SparkMax(30, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(31, MotorType.kBrushless);
     // Create our SmartMotorController from our Spark and config with the NEO.
-  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNeo550(1), smcConfig);
+  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
   /** Creates a new Shooter. */
- private final FlyWheelConfig motorConfig = new FlyWheelConfig(sparkSmartMotorController)
+ private final FlyWheelConfig rollerConfig = new FlyWheelConfig(sparkSmartMotorController)
   // Diameter of the flywheel.
   .withDiameter(Inches.of(4))
   // Mass of the flywheel.
@@ -71,16 +71,16 @@ import yams.motorcontrollers.local.SparkWrapper;
   // Maximum speed of the shooter.
   .withUpperSoftLimit(RPM.of(5000))
   // Telemetry name and verbosity for the arm.
-  .withTelemetry("MotorOnBottom", TelemetryVerbosity.HIGH);
+  .withTelemetry("Rollers", TelemetryVerbosity.HIGH);
 
   // Shooter Mechanism
-  private FlyWheel motor = new FlyWheel(motorConfig);
+  private FlyWheel rollers = new FlyWheel(rollerConfig);
     /**
    * Gets the current velocity of the shooter.
    *
    * @return Shooter velocity.
    */
-  public AngularVelocity getVelocity() {return motor.getSpeed();}
+  public AngularVelocity getVelocity() {return rollers.getSpeed();}
 
   /**
    * Set the shooter velocity.
@@ -88,14 +88,14 @@ import yams.motorcontrollers.local.SparkWrapper;
    * @param speed Speed to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command setVelocity(AngularVelocity speed) {return motor.run(speed);}
+  public Command setVelocity(AngularVelocity speed) {return rollers.run(speed);}
   
   /**
    * Set the shooter velocity setpoint.
    *
    * @param speed Speed to set
    */
-  public void setVelocitySetpoint(AngularVelocity speed) {motor.setMechanismVelocitySetpoint(speed);}
+  public void setVelocitySetpoint(AngularVelocity speed) {rollers.setMechanismVelocitySetpoint(speed);}
 
     /**
    * Set the dutycycle of the shooter.
@@ -103,20 +103,20 @@ import yams.motorcontrollers.local.SparkWrapper;
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command set(double dutyCycle) {return motor.set(dutyCycle);}
+  public Command set(double dutyCycle) {return rollers.set(dutyCycle);}
 
-  public MotorOnBottom() {}
+  public Rollers() {}
 
   @Override
   public void periodic() {
      // This method will be called once per scheduler run
-    motor.updateTelemetry();
+    rollers.updateTelemetry();
   }
 
     @Override
   public void simulationPeriodic(){
     
     // This method will be called once per scheduler run during simulation
-    motor.simIterate();
+    rollers.simIterate();
   }
 }

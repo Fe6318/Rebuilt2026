@@ -15,6 +15,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,6 +36,8 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
 public class IntakePivot extends SubsystemBase {
+   private SparkMax rightSpark = new SparkMax(30,MotorType.kBrushless);
+  private SparkMax leftSpark = new SparkMax(18, MotorType.kBrushless);
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
   // Feedback Constants (PID Constants)
@@ -55,12 +58,13 @@ public class IntakePivot extends SubsystemBase {
   .withIdleMode(MotorMode.BRAKE)
   .withStatorCurrentLimit(Amps.of(35))
   .withClosedLoopRampRate(Seconds.of(0.25))
-  .withOpenLoopRampRate(Seconds.of(0.25));
+  .withOpenLoopRampRate(Seconds.of(0.25))
+  .withFollowers(Pair.of(rightSpark,true));
    // Vendor motor controller object
-  private SparkMax spark = new SparkMax(18, MotorType.kBrushless);
+ 
   public IntakePivot() {}
   // Create our SmartMotorController from our Spark and config with the NEO.
-  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+  private SmartMotorController sparkSmartMotorController = new SparkWrapper(leftSpark, DCMotor.getNEO(1), smcConfig);
 
   private ArmConfig armCfg = new ArmConfig(sparkSmartMotorController)
 

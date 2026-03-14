@@ -29,7 +29,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.BallElevator;
 import frc.robot.subsystems.IntakeMain;
 import frc.robot.subsystems.IntakePivot;
-import frc.robot.subsystems.MotorOnBottom;
+import frc.robot.subsystems.Rollers;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -56,8 +56,8 @@ public class RobotContainer
   private final IntakeMain intakeMain = new IntakeMain();
   private final IntakePivot intakePivot = new IntakePivot();
   private final Shooter shooter = new Shooter();
-  private final MotorOnBottom motor = new MotorOnBottom();
   private final BallElevator ballElevator = new BallElevator();
+  private final Rollers rollers = new Rollers();
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
 
@@ -126,7 +126,12 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
     
     //Create the NamedCommands that will be used in PathPlanner
-    NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("startShoot", ballElevator.set(1).alongWith(rollers.set(0.25)));
+    NamedCommands.registerCommand("stopShoot", ballElevator.set(1).alongWith(rollers.set(0.25)));
+
+    NamedCommands.registerCommand("startIntake" , intakeMain.set(1));
+    NamedCommands.registerCommand("stopIntake", intakeMain.set(0));
+
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -139,18 +144,18 @@ public class RobotContainer
 
     //auto option to have the robot move back and shoot0\11
     autoChooser.addOption("Standard Auto", drivebase.driveForward().withTimeout(1.6)
-                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                 .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
-                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(motor.set(.6)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                 .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_DOWN_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
+                                                .andThen(intakePivot.set(PIVOT_UP_SPEED).alongWith(ballElevator.set(1)).alongWith(shooter.setVelocity(RPM.of(3100))).withTimeout(1))
                                                 .andThen(drivebase.drivebackward().withTimeout(1.6)));
     
     //Put the autoChooser on the SmartDashboard
@@ -166,10 +171,13 @@ public class RobotContainer
     // set the default command to force the ballElevator rest.
     ballElevator.setDefaultCommand(ballElevator.set(0));
 
+    // set the default command to force rollers to rest.
+    rollers.setDefaultCommand(rollers.set(0));
+
     //set the default comman to force the intakePivot down
    // intakePivot.setDefaultCommand(intakePivot.set(0.25));
 
-    motor.setDefaultCommand(motor.set(0));
+   
 
   }
 
@@ -246,12 +254,12 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     }
 // intake 
-operatorXbox.leftBumper().whileTrue(intakeMain.set(0.95));
-operatorXbox.rightBumper().whileTrue(intakeMain.set(-0.95));
+operatorXbox.leftBumper().whileTrue(intakeMain.set(1));
+operatorXbox.rightBumper().whileTrue(intakeMain.set(-1));
 
 
 // shoot 
-operatorXbox.a().whileTrue(ballElevator.set(1).alongWith(motor.set(0.6)));
+operatorXbox.a().whileTrue(ballElevator.set(1).alongWith(rollers.set(.25)));
 
 // intakePivot requested to comment out because of chain untill it is fixed.
 operatorXbox.povUp().whileTrue(intakePivot.set(PIVOT_UP_SPEED).alongWith(intakeMain.set(0.95)));
