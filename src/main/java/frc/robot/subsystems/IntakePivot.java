@@ -48,7 +48,7 @@ public class IntakePivot extends SubsystemBase {
   .withFeedforward(new ArmFeedforward(0, 0, .0))
   .withSimFeedforward(new ArmFeedforward(0, 0, 0))
   // Telemetry name and verbosity level
-  .withTelemetry("PivotMotor", TelemetryVerbosity.HIGH)
+  .withTelemetry("PivotMotor", TelemetryVerbosity.LOW)
   // Gearing from the motor rotor to final shaft.
   // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
   // You could also use .withGearing(12) which does the same thing.
@@ -56,7 +56,7 @@ public class IntakePivot extends SubsystemBase {
   // Motor properties to prevent over currenting.
   .withMotorInverted(false)
   .withIdleMode(MotorMode.BRAKE)
-  .withStatorCurrentLimit(Amps.of(35))
+  .withStatorCurrentLimit(Amps.of(30))
   .withClosedLoopRampRate(Seconds.of(0.25))
   .withOpenLoopRampRate(Seconds.of(0.25))
   .withFollowers(Pair.of(rightSpark,true));

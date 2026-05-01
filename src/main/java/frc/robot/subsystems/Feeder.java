@@ -37,50 +37,50 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
-  public class Shooter extends SubsystemBase {
+  public class Feeder extends SubsystemBase {
 
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
   // Feedback Constants (PID Constants)
-  .withClosedLoopController(0.00425, 0, 0)
-  .withSimClosedLoopController(0.00425, 0, 0)
+  .withClosedLoopController(0, 0, 0)
+  .withSimClosedLoopController(0, 0, 0)
   // Feedforward Constants
-  .withFeedforward(new SimpleMotorFeedforward(0.13725, 0.12, 0))
-  .withSimFeedforward(new SimpleMotorFeedforward(0.13725, 0.12, 0))
+  .withFeedforward(new SimpleMotorFeedforward(0, 0, 0))
+  .withSimFeedforward(new SimpleMotorFeedforward(0, 0, 0))
   // Telemetry name and verbosity level
-  .withTelemetry("ShooterMotor", TelemetryVerbosity.LOW)
+  .withTelemetry("Feeder", TelemetryVerbosity.HIGH)
   // Gearing from the motor rotor to final shaft.
   // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
   // You could also use .withGearing(12) which does the same thing.
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages(1)))
+  .withGearing(new MechanismGearing(GearBox.fromReductionStages(4)))
   // Motor properties to prevent over currenting.
-  .withMotorInverted(false)
+  .withMotorInverted(true)
   .withIdleMode(MotorMode.COAST)
-  .withStatorCurrentLimit(Amps.of(60));
+  .withStatorCurrentLimit(Amps.of(20));
 
    // Vendor motor controller object
-  private SparkMax spark = new SparkMax(11, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(32, MotorType.kBrushless);
     // Create our SmartMotorController from our Spark and config with the NEO.
-  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
-  /** Creates a new Shooter. */
- private final FlyWheelConfig shooterConfig = new FlyWheelConfig(sparkSmartMotorController)
+  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNeo550(1), smcConfig);
+  /** Creates a new ballElevator. */
+ private final FlyWheelConfig feederConfig = new FlyWheelConfig(sparkSmartMotorController)
   // Diameter of the flywheel.
   .withDiameter(Inches.of(4))
   // Mass of the flywheel.
   .withMass(Pounds.of(1))
-  // Maximum speed of the shooter.
-  .withUpperSoftLimit(RPM.of(5000))
+  // Maximum speed of the ballElevator.
+  .withUpperSoftLimit(RPM.of(10000))
   // Telemetry name and verbosity for the arm.
-  .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
+  .withTelemetry("Feeder", TelemetryVerbosity.LOW);
 
   // Shooter Mechanism
-  private FlyWheel shooter = new FlyWheel(shooterConfig);
+  private FlyWheel feeder = new FlyWheel(feederConfig);
     /**
    * Gets the current velocity of the shooter.
    *
    * @return Shooter velocity.
    */
-  public AngularVelocity getVelocity() {return shooter.getSpeed();}
+  public AngularVelocity getVelocity() {return feeder.getSpeed();}
 
   /**
    * Set the shooter velocity.
@@ -88,14 +88,14 @@ import yams.motorcontrollers.local.SparkWrapper;
    * @param speed Speed to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command setVelocity(AngularVelocity speed) {return shooter.run(speed);}
+  public Command setVelocity(AngularVelocity speed) {return feeder.run(speed);}
   
   /**
    * Set the shooter velocity setpoint.
    *
    * @param speed Speed to set
    */
-  public void setVelocitySetpoint(AngularVelocity speed) {shooter.setMechanismVelocitySetpoint(speed);}
+  public void setVelocitySetpoint(AngularVelocity speed) {feeder.setMechanismVelocitySetpoint(speed);}
 
     /**
    * Set the dutycycle of the shooter.
@@ -103,20 +103,20 @@ import yams.motorcontrollers.local.SparkWrapper;
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command set(double dutyCycle) {return shooter.set(dutyCycle);}
-
-  public Shooter() {}
+  public Command set(double dutyCycle) {return feeder.set(dutyCycle);}
+  
+  public Feeder() {}
 
   @Override
   public void periodic() {
      // This method will be called once per scheduler run
-    shooter.updateTelemetry();
+    feeder.updateTelemetry();
   }
 
     @Override
   public void simulationPeriodic(){
     
     // This method will be called once per scheduler run during simulation
-    shooter.simIterate();
+    feeder.simIterate();
   }
 }

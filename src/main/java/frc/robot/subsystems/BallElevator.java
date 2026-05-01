@@ -71,7 +71,7 @@ import yams.motorcontrollers.local.SparkWrapper;
   // Maximum speed of the ballElevator.
   .withUpperSoftLimit(RPM.of(10000))
   // Telemetry name and verbosity for the arm.
-  .withTelemetry("BallElevator", TelemetryVerbosity.HIGH);
+  .withTelemetry("BallElevator", TelemetryVerbosity.LOW);
 
   // Shooter Mechanism
   private FlyWheel ballElevator = new FlyWheel(ballElevatorConfig);

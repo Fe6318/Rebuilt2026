@@ -17,6 +17,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +65,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean     visionDriveTest = false;
+  private final boolean     visionDriveTest = true;
  
   /**
    * PhotonVision class to keep an accurate odometry.
@@ -141,7 +144,26 @@ public class SwerveSubsystem extends SubsystemBase
     if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+
+      boolean doRejectUpdate = true;
+        LimelightHelpers.SetRobotOrientation("limelight-front", swerveDrive.getOdometryHeading().getDegrees(), 0, 0, 0, 0, 0);
+  LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+   
+  // if our angular velocity is greater than 360 degrees per second, ignore vision updates
+  if(Math.abs(swerveDrive.getYaw().getDegrees()) > 360)
+  {
+    doRejectUpdate = true;
+  }  if(mt2.tagCount == 0)
+  {
+    doRejectUpdate = true;
+  }
+  if(!doRejectUpdate)
+  {
+    //m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+    swerveDrive.addVisionMeasurement(
+        mt2.pose,
+        mt2.timestampSeconds);
+  }
     }
   }
 
@@ -390,6 +412,12 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return run(() -> {
       swerveDrive.drive(new Translation2d(-1, 0), 0, false, false);
+    }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+  }
+  public Command slowDrivebackward()
+  {
+    return run(() -> {
+      swerveDrive.drive(new Translation2d(-0.3, 0), 0, false, false);
     }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
   }
 

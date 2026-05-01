@@ -34,15 +34,16 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class Turret extends SubsystemBase {
   private SparkMax turretMotor = new SparkMax(12, MotorType.kBrushless);
+  
 SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
       // Configure Motor and Mechanism properties
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4, 4)))
+      .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4, 4, 9.5)))
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
       // Setup Telemetry
-      .withTelemetry("TurretMotor", TelemetryVerbosity.HIGH)
+      .withTelemetry("TurretMotor", TelemetryVerbosity.LOW)
       // Power Optimization
       .withStatorCurrentLimit(Amps.of(40))
       .withClosedLoopRampRate(Seconds.of(0.25))
@@ -52,8 +53,8 @@ SmartMotorController motor = new SparkWrapper(turretMotor,DCMotor.getNEO(1),moto
 
 PivotConfig                turretConfig         = new PivotConfig(motor)
       .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
-      .withWrapping(Degrees.of(0), Degrees.of(360)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(0), Degrees.of(720)) // Hard limit bc wiring prevents infinite spinning
+     
+      .withHardLimit(Degrees.of(-90), Degrees.of(90)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("Turret", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Meters.of(0.25), Pounds.of(4)); // MOI Calculation
 
@@ -64,7 +65,15 @@ PivotConfig                turretConfig         = new PivotConfig(motor)
    * Set the angle of the arm.
    * @param angle Angle to go to.
    */
-  public Command setAngle(Angle angle) { return turret.setAngle(angle);}
+  public Command setAngle(Angle angle) { return turret.setAngle(angle); }
+  /**
+   * Set the dutycycle of the turret.
+   *
+   * @param dutyCycle DutyCycle to set.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
+   */
+  public Command set(double dutyCycle) {return turret.set(dutyCycle);}
+  public Command zero() {return runOnce(() -> { turretMotor.getEncoder().setPosition(0); });}
 
   @Override
   public void periodic() {

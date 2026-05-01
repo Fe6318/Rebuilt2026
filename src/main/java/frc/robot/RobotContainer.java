@@ -27,12 +27,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.BallElevator;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.IntakeMain;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.Rollers;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+import java.util.jar.Attributes.Name;
+
+
+import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
 
 /**
@@ -58,6 +64,8 @@ public class RobotContainer
   private final Shooter shooter = new Shooter();
   private final BallElevator ballElevator = new BallElevator();
   private final Rollers rollers = new Rollers();
+  private final Feeder feeder = new Feeder();
+  private final Turret turret = new Turret();
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
 
@@ -65,9 +73,9 @@ public class RobotContainer
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY(),
-                                                                () -> driverXbox.getLeftX())
-                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+                                                                () -> driverXbox.getLeftY() * -1,
+                                                                () -> driverXbox.getLeftX() * -1)
+                                                            .withControllerRotationAxis(driverXbox::getRightX)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -86,8 +94,8 @@ public class RobotContainer
                                                              .allianceRelativeControl(false);
 
   SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
-                                                                        () -> -driverXbox.getLeftY(),
-                                                                        () -> -driverXbox.getLeftX())
+                                                                        () -> -driverXbox.getLeftY() *-1,
+                                                                        () -> -driverXbox.getLeftX() *-1)
                                                                     .withControllerRotationAxis(() -> driverXbox.getRawAxis(
                                                                         2))
                                                                     .deadband(OperatorConstants.DEADBAND)
@@ -129,8 +137,16 @@ public class RobotContainer
     NamedCommands.registerCommand("startShoot", ballElevator.set(1).alongWith(rollers.set(0.25)));
     NamedCommands.registerCommand("stopShoot", ballElevator.set(1).alongWith(rollers.set(0.25)));
 
+    NamedCommands.registerCommand("intakeDown", intakePivot.set(PIVOT_DOWN_SPEED));
+    NamedCommands.registerCommand("intakeUp", intakePivot.set(PIVOT_UP_SPEED));
+     NamedCommands.registerCommand("intakeUpAndDown", intakePivot.set(PIVOT_UP_SPEED).withTimeout(1).andThen(intakePivot.set(PIVOT_DOWN_SPEED).withTimeout(1)).repeatedly());
+
     NamedCommands.registerCommand("startIntake" , intakeMain.set(1));
     NamedCommands.registerCommand("stopIntake", intakeMain.set(0));
+
+    NamedCommands.registerCommand("slowDriveBack", drivebase.slowDrivebackward());
+
+   
 
 
     //Have the autoChooser pull in all PathPlanner autos as options
@@ -165,7 +181,7 @@ public class RobotContainer
     // Set the default command to force the intake main rest.
     intakeMain.setDefaultCommand(intakeMain.set(0));
 
-    // set the default comman to foroce the shooter rest. 3500
+    // set the default comman to foroce the shooter rest. 3200
     shooter.setDefaultCommand(shooter.setVelocity(RPM.of(3200)));
 
     // set the default command to force the ballElevator rest.
@@ -173,6 +189,12 @@ public class RobotContainer
 
     // set the default command to force rollers to rest.
     rollers.setDefaultCommand(rollers.set(0));
+
+        // set the default command to force rollers to rest.
+    feeder.setDefaultCommand(feeder.set(0));
+
+    //set the default commad to force turret to stop
+    turret.setDefaultCommand(turret.set(0));
 
     //set the default comman to force the intakePivot down
    // intakePivot.setDefaultCommand(intakePivot.set(0.25));
@@ -259,12 +281,16 @@ operatorXbox.rightBumper().whileTrue(intakeMain.set(-1));
 
 
 // shoot 
-operatorXbox.a().whileTrue(ballElevator.set(1).alongWith(rollers.set(.25)));
+operatorXbox.a().whileTrue(ballElevator.set(1).alongWith(rollers.set(.50)).alongWith(feeder.set(.5)));
 
 // intakePivot requested to comment out because of chain untill it is fixed.
-operatorXbox.povUp().whileTrue(intakePivot.set(PIVOT_UP_SPEED).alongWith(intakeMain.set(0.95)));
+operatorXbox.povUp().whileTrue(intakePivot.set(PIVOT_UP_SPEED));
 operatorXbox.povDown().whileTrue(intakePivot.set(PIVOT_DOWN_SPEED));
 
+//turretf
+operatorXbox.povLeft().whileTrue(turret.set(.1));
+operatorXbox.povRight().whileTrue(turret.set(-.1));
+operatorXbox.back().onTrue(turret.zero());
 //intake piviot move down
 //operatorXbox.y().whileTrue(intakePivot.set(0.25));
 
